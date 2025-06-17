@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 const String _iv = '01234567';
 
 class Flutter3des {
-  static const MethodChannel _channel = const MethodChannel('flutter_3des');
+  static const MethodChannel _channel = MethodChannel('flutter_3des');
 
   /// @param string data to be encrypted
   /// @param key  can't be less than 8 bits

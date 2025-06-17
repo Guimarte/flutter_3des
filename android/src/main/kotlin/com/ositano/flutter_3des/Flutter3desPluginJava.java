@@ -8,11 +8,50 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 
-public class Flutter3desPluginJava {
+public class Flutter3desPlugin implements FlutterPlugin, MethodCallHandler {
+private MethodChannel channel;
 
 
     private static final String ALGORITHM_3DES = "DESede/CBC/PKCS5Padding";
     private static final String KEY_INSTANCE = "DESede";
+
+
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_3des");
+    channel.setMethodCallHandler(this);
+  }
+
+    @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    channel.setMethodCallHandler(null);
+  }
+ @Override
+  public void onMethodCall(MethodCall call, Result result) {
+    String key = call.argument("key");
+    String iv = call.argument("iv");
+
+    switch (call.method) {
+      case "encryptToHex":
+        String data = call.argument("data");
+        String encrypted = Flutter3desPluginJava.encryptToHex(data, key, iv);
+        result.success(encrypted);
+        break;
+      case "decryptFromHex":
+        String encryptedHex = call.argument("data");
+        String decrypted = Flutter3desPluginJava.decryptFromHex(encryptedHex, key, iv);
+        result.success(decrypted);
+        break;
+      default:
+        result.notImplemented();
+    }
+  }
+}
+
+public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
+  final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_3des");
+  channel.setMethodCallHandler(new Flutter3desPlugin());
+}
 
     /**
      * Encrypt
